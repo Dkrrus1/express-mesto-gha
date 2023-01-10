@@ -1,15 +1,15 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const router = require('express').Router();
-const userRouter = require('./routes/users');
-const cardRouter = require('./routes/cards');
+const router = require('./routes');
+// const userRouter = require('./routes/users');
+// const cardRouter = require('./routes/cards');
 
-const { PORT = 3000 } = process.env;
+const { PORT = 3000, DBLINK = 'mongodb://localhost:27017/mestodb' } = process.env;
 
 const app = express();
 app.use(express.json());
 
-mongoose.connect('mongodb://localhost:27017/mestodb', {
+mongoose.connect(DBLINK, {
   useNewUrlParser: true,
 });
 
@@ -20,11 +20,6 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(userRouter);
-app.use(cardRouter);
-
-router.use((req, res) => {
-  res.status(404).send({ message: 'Страница по указанному маршруту не найдена' });
-});
+app.use(router);
 
 app.listen(PORT);
