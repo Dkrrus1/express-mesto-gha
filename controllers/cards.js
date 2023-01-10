@@ -58,7 +58,7 @@ const likeCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(404).send({ message: 'Карточка не найдена!' });
+        res.status(400).send({ message: 'Карточка не найдена!' });
       } else if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Переданы некорректные данные в методы постановки лайка' });
       } else {
@@ -84,7 +84,7 @@ const dislikeCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(404).send({ message: 'Карточка не найдена!' });
+        res.status(400).send({ message: 'Карточка не найдена!' });
       } else if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Переданы некорректные данные в методы снятия лайка' });
       } else {
