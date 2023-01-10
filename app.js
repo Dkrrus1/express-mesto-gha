@@ -23,9 +23,6 @@ app.use((req, res, next) => {
 app.use(userRouter);
 app.use(cardRouter);
 
-router.use('/users', userRouter);
-router.use('/cards', cardRouter);
-
 router.use((req, res) => {
   res.status(404).send({ message: 'Страница по указанному маршруту не найдена' });
 });

@@ -1,7 +1,7 @@
 const Card = require('../models/card');
 
 const getCard = (req, res) => {
-  Card.find({})
+  Card.find({}).populate('owner')
     .then((cards) => res.send(cards))
     .catch(() => res.status(500).send({ message: 'Внутренняя ошибка сервера. Повторите запрос позже.' }));
 };
