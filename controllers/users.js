@@ -21,7 +21,7 @@ const getUser = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(404).send({ message: 'Пользователь не найден!' });
+        res.status(400).send({ message: 'Пользователь не найден!' });
         return;
       }
       res.status(500).send({ message: 'Внутренняя ошибка сервера. Повторите запрос позже.' });
@@ -59,7 +59,7 @@ const updateUser = (req, res) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Переданы некорректные данные в методы обновления пользователя.' });
       } else if (err.name === 'CastError') {
-        res.status(404).send({ message: 'Пользователь не найден!' });
+        res.status(400).send({ message: 'Пользователь не найден!' });
       } else {
         res.status(500).send({ message: 'Внутренняя ошибка сервера. Повторите запрос позже.' });
       }
@@ -83,7 +83,7 @@ const updateAvatar = (req, res) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Переданы некорректные данные в методы обновления пользователя.' });
       } else if (err.name === 'CastError') {
-        res.status(404).send({ message: 'Пользователь не найден!' });
+        res.status(400).send({ message: 'Пользователь не найден!' });
       } else {
         res.status(500).send({ message: 'Внутренняя ошибка сервера. Повторите запрос позже.' });
       }
