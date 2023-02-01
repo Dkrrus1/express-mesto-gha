@@ -1,3 +1,4 @@
+const bcrypt = require('bcryptjs');
 const responseStatusCodes = require('../constants/constants');
 const User = require('../models/user');
 
@@ -30,16 +31,33 @@ const getUser = (req, res) => {
 };
 
 const createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-
-  User.create({ name, about, avatar })
-    .then((user) => res.status(201).send(user))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(responseStatusCodes.badRequest).send({ message: 'Переданы некорректные данные в методы создания пользователя.' });
-        return;
-      }
-      res.status(responseStatusCodes.serverError).send({ message: 'Внутренняя ошибка сервера. Повторите запрос позже.' });
+  const {
+    name,
+    about,
+    avatar,
+    email,
+    password,
+  } = req.body;
+  bcrypt.hash(password, 10)
+    .then((hash) => {
+      User.create({
+        name,
+        about,
+        avatar,
+        email,
+        password: hash,
+      })
+        .then((user) => res.status(201)
+          .send(user))
+        .catch((err) => {
+          if (err.name === 'ValidationError') {
+            res.status(responseStatusCodes.badRequest)
+              .send({ message: 'Переданы некорректные данные в методы создания пользователя.' });
+            return;
+          }
+          res.status(responseStatusCodes.serverError)
+            .send({ message: 'Внутренняя ошибка сервера. Повторите запрос позже.' });
+        });
     });
 };
 

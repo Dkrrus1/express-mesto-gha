@@ -1,8 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const router = require('./routes');
-// const userRouter = require('./routes/users');
-// const cardRouter = require('./routes/cards');
 
 const { PORT = 3000, DBLINK = 'mongodb://localhost:27017/mestodb' } = process.env;
 
