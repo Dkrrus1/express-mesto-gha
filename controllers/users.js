@@ -18,7 +18,7 @@ const getUser = (req, res, next) => {
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        throw new ErrorNotFound('Пользователь не найден!');
+        throw new ErrorBadRequest('Пользователь не найден!');
       } else {
         res.send(user);
       }
@@ -122,8 +122,13 @@ const getCurrentUser = (req, res, next) => {
   const owner = req.user.id;
 
   User.findById(owner)
-    .then((user) => {
-      res.send(user);
+    .then(() => {
+      res.send({
+        _id: owner,
+        user: owner.name,
+        about: owner.about,
+        avatar: owner.avatar,
+      });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
