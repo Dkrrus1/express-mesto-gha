@@ -1,47 +1,54 @@
 const Card = require('../models/card');
-const responseStatusCodes = require('../constants/constants');
+const ErrorNotFound = require('../utils/badrequest');
+const ErrorBadRequest = require('../utils/badrequest');
+const ErrorForbidden = require('../utils/forbidden');
 
-const getCard = (req, res) => {
+const getCard = (req, res, next) => {
   Card.find({}).populate('owner')
     .then((cards) => res.send(cards))
-    .catch(() => res.status(responseStatusCodes.notFound).send({ message: 'Внутренняя ошибка сервера. Повторите запрос позже.' }));
+    .catch(next);
 };
 
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user._id;
   Card.create({ name, link, owner })
     .then((card) => res.status(201).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(responseStatusCodes.badRequest).send({ message: 'Переданы некорректные данные в методы создания карточки.' });
-        return;
+        next(new ErrorBadRequest('Переданы некорректные данные в методы создания карточки.'));
       }
-      res.status(responseStatusCodes.serverError).send({ message: 'Внутренняя ошибка сервера. Повторите запрос позже.' });
+      next(err);
     });
 };
 
-const deleteCard = (req, res) => {
+const deleteCard = (req, res, next) => {
+  const owner = req.user.id;
   const { cardId } = req.params;
 
-  Card.findByIdAndRemove(cardId)
+  Card.findById(cardId)
     .then((card) => {
       if (!card) {
-        res.status(responseStatusCodes.notFound).send({ message: 'Карточка не найдена!' });
+        throw new ErrorNotFound('Карточка не найдена!');
+      } else if (owner.toString() !== card.owner.toString()) {
+        throw new ErrorForbidden(`Пользователь с ID ${owner} не имеет прав для удаления данной карточки`);
       } else {
-        res.send({ message: 'Карточка удалена!' });
+        Card.findByIdAndRemove(cardId)
+          .then(() => {
+            res.send({ message: 'Карточка удалена!' });
+          })
+          .catch(next);
       }
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(responseStatusCodes.badRequest).send({ message: 'Переданы некорректные данные в методы удаления карточки' });
-        return;
+    .catch((error) => {
+      if (error.name === 'CastError') {
+        next(new ErrorBadRequest('Переданы некорректные данные в методы удаления карточки'));
       }
-      res.status(responseStatusCodes.serverError).send({ message: 'Внутренняя ошибка сервера. Повторите запрос позже.' });
+      next(error);
     });
 };
 
-const likeCard = (req, res) => {
+const likeCard = (req, res, next) => {
   const owner = req.user._id;
   const { cardId } = req.params;
 
@@ -52,23 +59,23 @@ const likeCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        res.status(responseStatusCodes.notFound).send({ message: 'Карточка не найдена!' });
+        throw new ErrorNotFound('Карточка не найдена!');
       } else {
         res.send(card);
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(responseStatusCodes.badRequest).send({ message: 'Карточка не найдена!' });
+        next(new ErrorBadRequest('Карточка не найдена!'));
       } else if (err.name === 'ValidationError') {
-        res.status(responseStatusCodes.badRequest).send({ message: 'Переданы некорректные данные в методы постановки лайка' });
+        next(new ErrorBadRequest('Переданы некорректные данные в методы постановки лайка'));
       } else {
-        res.status(responseStatusCodes.serverError).send({ message: 'Внутренняя ошибка сервера. Повторите запрос позже.' });
+        next(err);
       }
     });
 };
 
-const dislikeCard = (req, res) => {
+const dislikeCard = (req, res, next) => {
   const owner = req.user._id;
   const { cardId } = req.params;
   Card.findByIdAndUpdate(
@@ -78,18 +85,18 @@ const dislikeCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        res.status(responseStatusCodes.notFound).send({ message: 'Карточка не найдена!' });
+        throw new ErrorNotFound('Карточка не найдена!');
       } else {
         res.send(card);
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(responseStatusCodes.badRequest).send({ message: 'Карточка не найдена!' });
+        next(new ErrorBadRequest('Карточка не найдена!'));
       } else if (err.name === 'ValidationError') {
-        res.status(responseStatusCodes.badRequest).send({ message: 'Переданы некорректные данные в методы снятия лайка' });
+        next(new ErrorBadRequest('Переданы некорректные данные в методы снятия лайка'));
       } else {
-        res.status(responseStatusCodes.serverError).send({ message: 'Внутренняя ошибка сервера. Повторите запрос позже.' });
+        next(err);
       }
     });
 };
