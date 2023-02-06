@@ -1,6 +1,7 @@
 const Card = require('../models/card');
 const ErrorBadRequest = require('../utils/badrequest');
 const ErrorForbidden = require('../utils/forbidden');
+const ErrorNotFound = require('../utils/notfound');
 
 const getCard = (req, res, next) => {
   Card.find({}).populate('owner')
@@ -22,13 +23,13 @@ const createCard = (req, res, next) => {
 };
 
 const deleteCard = (req, res, next) => {
-  const owner = req.user.id;
+  const owner = req.user._id;
   const { cardId } = req.params;
 
   Card.findById(cardId)
     .then((card) => {
       if (!card) {
-        throw new ErrorBadRequest('Карточка не найдена!');
+        throw new ErrorNotFound('Карточка не найдена!');
       } else if (owner.toString() !== card.owner.toString()) {
         throw new ErrorForbidden(`Пользователь с ID ${owner} не имеет прав для удаления данной карточки`);
       } else {
@@ -58,7 +59,7 @@ const likeCard = (req, res, next) => {
   )
     .then((card) => {
       if (!card) {
-        throw new ErrorBadRequest('Карточка не найдена!');
+        throw new ErrorNotFound('Карточка не найдена!');
       } else {
         res.send(card);
       }
@@ -84,7 +85,7 @@ const dislikeCard = (req, res, next) => {
   )
     .then((card) => {
       if (!card) {
-        throw new ErrorBadRequest('Карточка не найдена!');
+        throw new ErrorNotFound('Карточка не найдена!');
       } else {
         res.send(card);
       }

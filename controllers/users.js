@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const ErrorNotFound = require('../utils/badrequest');
+const ErrorNotFound = require('../utils/notfound');
 const ErrorBadRequest = require('../utils/badrequest');
 const ErrorUnauth = require('../utils/unauth');
 const ErrorConflict = require('../utils/conflict');
@@ -18,7 +18,7 @@ const getUser = (req, res, next) => {
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        throw new ErrorBadRequest('Пользователь не найден!');
+        throw new ErrorNotFound('Пользователь не найден!');
       } else {
         res.send(user);
       }
