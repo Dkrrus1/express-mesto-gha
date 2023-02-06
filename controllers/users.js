@@ -122,21 +122,10 @@ const getCurrentUser = (req, res, next) => {
   const owner = req.user.id;
 
   User.findById(owner)
-    .then(() => {
-      res.send({
-        _id: owner,
-        user: owner.name,
-        about: owner.about,
-        avatar: owner.avatar,
-      });
+    .then((user) => {
+      res.send(user);
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new ErrorBadRequest('Пользователь не найден!'));
-      } else {
-        next(err);
-      }
-    });
+    .catch(next);
 };
 
 const login = (req, res, next) => {
