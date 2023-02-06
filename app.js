@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const { errors } = require('celebrate');
 const cookieParser = require('cookie-parser');
 const router = require('./routes');
 const internalError = require('./middlewares/internalError');
@@ -15,6 +16,7 @@ mongoose.connect(DBLINK, {
 });
 
 app.use(router);
+app.use(errors());
 app.use(internalError);
 
 app.listen(PORT);
