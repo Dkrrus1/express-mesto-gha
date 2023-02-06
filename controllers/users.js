@@ -123,7 +123,6 @@ const getCurrentUser = (req, res, next) => {
 
   User.findById(owner)
     .then((user) => {
-      console.log(user);
       res.send(user);
     })
     .catch(next);
