@@ -23,12 +23,7 @@ const getUser = (req, res, next) => {
         res.send(user);
       }
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new ErrorBadRequest('Пользователь не найден!'));
-      }
-      next(err);
-    });
+    .catch(next);
 };
 
 const createUser = (req, res, next) => {
@@ -48,8 +43,13 @@ const createUser = (req, res, next) => {
         email,
         password: hash,
       })
-        .then((user) => res.status(201)
-          .send(user))
+        .then(() => res.status(201)
+          .send({
+            name,
+            about,
+            avatar,
+            email,
+          }))
         .catch((err) => {
           if (err.code === 11000) {
             next(new ErrorConflict('Пользователь с таким E-Mail уже существует'));
