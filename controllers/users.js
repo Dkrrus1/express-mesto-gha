@@ -118,6 +118,23 @@ const updateAvatar = (req, res) => {
     });
 };
 
+const getCurrentUser = (req, res) => {
+  const owner = req.user.id;
+
+  User.findById(owner)
+    .then((user) => {
+      res.send(user);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(responseStatusCodes.badRequest).send({ message: 'Пользователь не найден!' });
+      } else {
+        res.status(responseStatusCodes.serverError)
+          .send({ message: 'Внутренняя ошибка сервера. Повторите запрос позже.' });
+      }
+    });
+};
+
 const login = (req, res) => {
   const {
     email,
@@ -160,4 +177,5 @@ module.exports = {
   updateUser,
   updateAvatar,
   login,
+  getCurrentUser,
 };
