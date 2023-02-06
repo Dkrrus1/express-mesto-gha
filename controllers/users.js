@@ -119,10 +119,11 @@ const updateAvatar = (req, res, next) => {
 };
 
 const getCurrentUser = (req, res, next) => {
-  const owner = req.user.id;
+  const owner = req.user._id;
 
   User.findById(owner)
     .then((user) => {
+      console.log(user);
       res.send(user);
     })
     .catch(next);
