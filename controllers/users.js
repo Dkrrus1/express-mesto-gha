@@ -6,6 +6,8 @@ const ErrorBadRequest = require('../utils/badrequest');
 const ErrorUnauth = require('../utils/unauth');
 const ErrorConflict = require('../utils/conflict');
 
+const { JWT_SECRET = 'some-secret-key' } = process.env;
+
 const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
@@ -147,7 +149,7 @@ const login = (req, res, next) => {
           }
           const token = jwt.sign(
             { _id: user._id },
-            'some-secret-key',
+            JWT_SECRET,
             { expiresIn: 60480000 },
           );
           res.cookie('jwt', token, {
